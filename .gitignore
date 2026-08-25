@@ -1,0 +1,23 @@
+# Build artifacts
+build/
+obj_dir/
+*.vvp
+*.vcd
+*.wdb
+*.jou
+*.log
+!reports/**/*.log
+!regressions/**
+
+# Vivado
+vivado/*/runs/*/
+*.str
+.Xil/
+*.bak
+*.rpt!
+!reports/**/*.rpt
+
+# Editors
+*~
+.vscode/
+.idea/
