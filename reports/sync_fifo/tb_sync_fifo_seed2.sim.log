@@ -1,0 +1,149 @@
+tb_sync_fifo: SEED=2 NCYC=600
+[435000] C3 ERROR: pop data got 000d expected 0006 (ih=0 cnt=6)
+[445000] C3 ERROR: pop data got 001a expected 000d (ih=1 cnt=5)
+[445000] C4 ERROR: fwft data got ad expected 06
+[455000] C3 ERROR: pop data got 0035 expected 001a (ih=2 cnt=4)
+[465000] C3 ERROR: pop data got 006a expected 0035 (ih=3 cnt=3)
+[475000] C3 ERROR: pop data got 00d5 expected 006a (ih=4 cnt=2)
+[485000] C3 ERROR: pop data got 00aa expected 00d5 (ih=5 cnt=1)
+[495000] C3 ERROR: pop data got 0055 expected 00aa (ih=6 cnt=0)
+[645000] C3 ERROR: pop data got 0002 expected 0001 (ih=0 cnt=6)
+[655000] C3 ERROR: pop data got 0003 expected 0002 (ih=1 cnt=5)
+[655000] C4 ERROR: fwft data got 09 expected 01
+[665000] C3 ERROR: pop data got 0004 expected 0003 (ih=2 cnt=4)
+[675000] C3 ERROR: pop data got 0005 expected 0004 (ih=3 cnt=3)
+[685000] C3 ERROR: pop data got 0006 expected 0005 (ih=4 cnt=2)
+[695000] C3 ERROR: pop data got 0007 expected 0006 (ih=5 cnt=1)
+[945000] C2 ERROR: fwft data got 16 expected 77
+[945000] C4 ERROR: fwft data got 16 expected 77
+[1025000] C2 ERROR: fwft data got 3e expected 77
+[1025000] C4 ERROR: fwft data got 3e expected 77
+[1215000] C4 ERROR: fwft data got bb expected cc
+[1225000] C4 ERROR: fwft data got 76 expected 99
+[1235000] C4 ERROR: fwft data got ed expected 32
+[1295000] C4 ERROR: fwft data got 4a expected cc
+[1305000] C4 ERROR: fwft data got 94 expected 99
+[1315000] C4 ERROR: fwft data got 29 expected 32
+[1375000] C4 ERROR: fwft data got 47 expected cc
+[1385000] C4 ERROR: fwft data got 8e expected 99
+[1395000] C4 ERROR: fwft data got 1d expected 32
+[1455000] C4 ERROR: fwft data got 5a expected cc
+[1465000] C4 ERROR: fwft data got b4 expected 99
+[1475000] C4 ERROR: fwft data got 68 expected 32
+[1535000] C4 ERROR: fwft data got 18 expected cc
+[1545000] C4 ERROR: fwft data got 30 expected 99
+[1555000] C4 ERROR: fwft data got 61 expected 32
+[1615000] C4 ERROR: fwft data got 72 expected cc
+[1625000] C3 ERROR: pop data got 00c3 expected 0072 (ih=0 cnt=6)
+[1625000] C4 ERROR: fwft data got e5 expected 99
+[1635000] C3 ERROR: pop data got 0087 expected 00e5 (ih=1 cnt=5)
+[1635000] C4 ERROR: fwft data got cb expected 32
+[1645000] C3 ERROR: pop data got 000e expected 00cb (ih=2 cnt=4)
+[1655000] C3 ERROR: pop data got 001c expected 00d0 (ih=3 cnt=3)
+[1665000] C3 ERROR: pop data got 0039 expected 00a1 (ih=4 cnt=2)
+[1675000] C3 ERROR: pop data got 0072 expected 0043 (ih=5 cnt=1)
+[1685000] C3 ERROR: pop data got 00e5 expected 0086 (ih=6 cnt=0)
+[1695000] C3 ERROR: pop data got 00cb expected 000c (ih=7 cnt=0)
+[2395000] C4 ERROR: fwft data got 13 expected 21
+[2605000] C2 ERROR: fwft data got 41 expected 3a
+[2605000] C4 ERROR: fwft data got 83 expected 3a
+[2615000] C2 ERROR: fwft data got 83 expected 74
+[2615000] C4 ERROR: fwft data got 06 expected 74
+[2625000] C2 ERROR: fwft data got 06 expected e9
+[2625000] C4 ERROR: fwft data got 0c expected e9
+[2635000] C2 ERROR: fwft data got 0c expected d2
+[2685000] C2 ERROR: fwft data got 9e expected 3a
+[2685000] C4 ERROR: fwft data got 3c expected 3a
+[2695000] C2 ERROR: fwft data got 3c expected 74
+[2695000] C4 ERROR: fwft data got 79 expected 74
+[2705000] C2 ERROR: fwft data got 79 expected e9
+[2705000] C4 ERROR: fwft data got f2 expected e9
+[2715000] C2 ERROR: fwft data got f2 expected d2
+[2765000] C2 ERROR: fwft data got 4d expected 3a
+[2765000] C4 ERROR: fwft data got 9b expected 3a
+[2775000] C2 ERROR: fwft data got 9b expected 74
+[2775000] C4 ERROR: fwft data got 36 expected 74
+[2785000] C2 ERROR: fwft data got 36 expected e9
+[2785000] C4 ERROR: fwft data got 6c expected e9
+[2795000] C2 ERROR: fwft data got 6c expected d2
+[2836000] PROBE FAIL: U1 retire rate 1/cycle got 31 expected 32
+[2836000] PROBE FAIL: U3 retire rate 1/cycle got 30 expected 32
+[3155000] C2 ERROR: fwft data got 46 expected 00
+[3155000] C4 ERROR: fwft data got 46 expected 00
+[3405000] C2 ERROR: fwft data got 9f expected 16
+[3405000] C4 ERROR: fwft data got 9f expected 16
+[3635000] C2 ERROR: fwft data got 22 expected 26
+[3635000] C4 ERROR: fwft data got 22 expected 26
+[3805000] C2 ERROR: fwft data got cb expected 8c
+[3805000] C4 ERROR: fwft data got cb expected 8c
+[4435000] C2 ERROR: fwft data got 9e expected 07
+[4435000] C4 ERROR: fwft data got 9e expected 07
+[4555000] C2 ERROR: fwft data got da expected 07
+[4555000] C4 ERROR: fwft data got da expected 07
+[4655000] C2 ERROR: fwft data got f5 expected 07
+[4655000] C4 ERROR: fwft data got f5 expected 07
+[4735000] C2 ERROR: fwft data got ca expected 07
+[4735000] C4 ERROR: fwft data got ca expected 07
+[4845000] C2 ERROR: fwft data got 9e expected 07
+[4845000] C4 ERROR: fwft data got 9e expected 07
+[5135000] C2 ERROR: fwft data got 82 expected d3
+[5135000] C4 ERROR: fwft data got 82 expected d3
+[5735000] C2 ERROR: fwft data got db expected 27
+[5735000] C4 ERROR: fwft data got db expected 27
+[6265000] C2 ERROR: fwft data got 8d expected 6b
+[6265000] C4 ERROR: fwft data got 8d expected 6b
+[7145000] C2 ERROR: fwft data got ac expected c6
+[7145000] C4 ERROR: fwft data got ac expected c6
+[7525000] C2 ERROR: fwft data got a0 expected ab
+[7525000] C4 ERROR: fwft data got a0 expected ab
+[7955000] C2 ERROR: fwft data got ed expected e7
+[7955000] C4 ERROR: fwft data got ed expected e7
+[8165000] C2 ERROR: fwft data got 44 expected 9e
+[8165000] C4 ERROR: fwft data got 44 expected 9e
+[8395000] C2 ERROR: fwft data got de expected a5
+[8395000] C4 ERROR: fwft data got de expected a5
+[8525000] C2 ERROR: fwft data got 29 expected a5
+[8525000] C4 ERROR: fwft data got 29 expected a5
+[8615000] C2 ERROR: fwft data got ee expected a5
+[8615000] C4 ERROR: fwft data got ee expected a5
+[8875000] C2 ERROR: fwft data got 9e expected d6
+[8875000] C4 ERROR: fwft data got 9e expected d6
+[8955000] C2 ERROR: fwft data got 0a expected d6
+[8955000] C4 ERROR: fwft data got 0a expected d6
+[9305000] C2 ERROR: fwft data got 5e expected a3
+[9305000] C4 ERROR: fwft data got 5e expected a3
+[9795000] C2 ERROR: fwft data got 42 expected 55
+[9795000] C4 ERROR: fwft data got 42 expected 55
+[9905000] C2 ERROR: fwft data got fe expected 55
+[9905000] C4 ERROR: fwft data got fe expected 55
+[10025000] C2 ERROR: fwft data got 35 expected 55
+[10025000] C4 ERROR: fwft data got 35 expected 55
+[10105000] C2 ERROR: fwft data got 24 expected 55
+[10105000] C4 ERROR: fwft data got 24 expected 55
+[10205000] C2 ERROR: fwft data got 70 expected 55
+[10205000] C4 ERROR: fwft data got 70 expected 55
+CHECKER C1 errors=0
+CHECKER C2 errors=41
+CHECKER C3 errors=21
+CHECKER C4 errors=59
+COVER: occ0 1401
+COVER: occ1 1832
+COVER: occmid 108
+COVER: occdepthm1 104
+COVER: occfull 274
+COVER: wrap_write 316
+COVER: wrap_read 269
+COVER: simul_full 3
+COVER: simul_empty 512
+COVER: simul_mid 1101
+COVER: overflow_events 250
+COVER: underflow_events 513
+COVER: threshold_cross_up 28
+COVER: threshold_cross_dn 13
+COVER: almost_full_asserts 294
+COVER: almost_empty_asserts 3245
+COVER: errclear_race 8
+COVER: bp_max_streak 47
+COVER: reset_midstream 45
+RESULT: FAIL (123 errors)
+tb/sync_fifo/tb_sync_fifo.sv:467: $finish called at 10736000 (1ps)

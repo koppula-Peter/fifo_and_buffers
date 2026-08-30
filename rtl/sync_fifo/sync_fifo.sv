@@ -90,18 +90,21 @@ module sync_fifo #(
 
     // Elaboration-time validation (FAM-COMMON-002).
     initial begin
-        if (DATA_WIDTH < 1)                          $error("sync_fifo: DATA_WIDTH must be >= 1");
-        if (DEPTH < 2)                               $error("sync_fifo: DEPTH must be >= 2");
-        if (AFULL < 1 || AFULL > DEPTH)              $error("sync_fifo: ALMOST_FULL_THRESHOLD out of 1..DEPTH");
-        if (AEMPTY < 0 || AEMPTY > DEPTH-1)          $error("sync_fifo: ALMOST_EMPTY_THRESHOLD out of 0..DEPTH-1");
-        if (FWFT_ENABLE  != 0 && FWFT_ENABLE  != 1)  $error("sync_fifo: FWFT_ENABLE must be 0/1");
-        if (OUTPUT_REGISTER != 0 && OUTPUT_REGISTER != 1) $error("sync_fifo: OUTPUT_REGISTER must be 0/1");
+        if (DATA_WIDTH < 1)                          $fatal(1,"sync_fifo: DATA_WIDTH must be >= 1");
+        if (DEPTH < 2)                               $fatal(1,"sync_fifo: DEPTH must be >= 2");
+        if (AFULL < 1 || AFULL > DEPTH)              $fatal(1,"sync_fifo: ALMOST_FULL_THRESHOLD out of 1..DEPTH");
+        if (AEMPTY < 0 || AEMPTY > DEPTH-1)          $fatal(1,"sync_fifo: ALMOST_EMPTY_THRESHOLD out of 0..DEPTH-1");
+        if (FWFT_ENABLE  != 0 && FWFT_ENABLE  != 1)  $fatal(1,"sync_fifo: FWFT_ENABLE must be 0/1");
+        if (OUTPUT_REGISTER != 0 && OUTPUT_REGISTER != 1) $fatal(1,"sync_fifo: OUTPUT_REGISTER must be 0/1");
         if (OVERFLOW_POLICY  != fifo_pkg::OVF_REJECT &&
-            OVERFLOW_POLICY  != fifo_pkg::OVF_OVERWRITE) $error("sync_fifo: bad OVERFLOW_POLICY");
+            OVERFLOW_POLICY  != fifo_pkg::OVF_OVERWRITE) $fatal(1,"sync_fifo: bad OVERFLOW_POLICY");
         if (UNDERFLOW_POLICY != fifo_pkg::UNF_HOLD &&
-            UNDERFLOW_POLICY != fifo_pkg::UNF_ZERO)      $error("sync_fifo: bad UNDERFLOW_POLICY");
-        if (STAT_ENABLE  != 0 && STAT_ENABLE  != 1)  $error("sync_fifo: STAT_ENABLE must be 0/1");
-        if (DEBUG_ENABLE != 0 && DEBUG_ENABLE != 1)  $error("sync_fifo: DEBUG_ENABLE must be 0/1");
+            UNDERFLOW_POLICY != fifo_pkg::UNF_ZERO)      $fatal(1,"sync_fifo: bad UNDERFLOW_POLICY");
+        if (STAT_ENABLE  != 0 && STAT_ENABLE  != 1)  $fatal(1,"sync_fifo: STAT_ENABLE must be 0/1");
+        if (MEMORY_TYPE != fifo_pkg::MEM_REG && MEMORY_TYPE != fifo_pkg::MEM_LUTRAM &&
+            MEMORY_TYPE != fifo_pkg::MEM_BRAM && MEMORY_TYPE != fifo_pkg::MEM_AUTO)
+                                              $fatal(1,"sync_fifo: bad MEMORY_TYPE");
+        if (DEBUG_ENABLE != 0 && DEBUG_ENABLE != 1)  $fatal(1,"sync_fifo: DEBUG_ENABLE must be 0/1");
     end
 
     // -------------------------------------------------------------- pointers
@@ -122,11 +125,22 @@ module sync_fifo #(
                           (OVERFLOW_POLICY == fifo_pkg::OVF_OVERWRITE)
                                                                    ? ~pop_granted :
                                                                      1'b0 );
-    wire ovf_event_w  = wr_en && !push_granted;
+    // Any push onto a full FIFO is an overflow observation (SPEC §6): rejected
+    // words (REJECT) and discarded-oldest words (OVERWRITE) both raise events.
+    wire ovf_event_w  = wr_en && (!push_granted ||
+                                 (OVERFLOW_POLICY == fifo_pkg::OVF_OVERWRITE &&
+                                  count_q == CNT_W'(DEPTH)));
     wire unf_event_w  = rd_en && (count_q == '0);
+    // OVERWRITE on full = discard oldest + append newest: both pointers move,
+    // occupancy unchanged (inc+dec cancel). P2 rule still rejects the push
+    // when a pop is simultaneously granted (push_granted is 0 then).
+    wire overwrite_wr = push_granted && (count_q == CNT_W'(DEPTH));
+    wire rd_advance   = pop_granted || overwrite_wr;
 
-    wire count_inc = push_granted && !pop_granted;
-    wire count_dec = pop_granted  && !push_granted;
+    // Occupancy delta counts an OVERWRITE as simultaneous retire+insert
+    wire eff_pop   = pop_granted || overwrite_wr;
+    wire count_inc = push_granted && !eff_pop;
+    wire count_dec = eff_pop   && !push_granted;
 
     always_ff @(posedge clk) begin
         if (rst) begin
@@ -135,8 +149,7 @@ module sync_fifo #(
             count_q   <= '0;
         end else begin
             if (push_granted) wr_addr_q <= nxt(wr_addr_q);
-            // OVERWRITE stores into the head slot: read pointer stays put.
-            if (pop_granted)  rd_addr_q <= nxt(rd_addr_q);
+            if (rd_advance)   rd_addr_q <= nxt(rd_addr_q);
             if      (count_inc) count_q <= count_q + 1'b1;
             else if (count_dec) count_q <= count_q - 1'b1;
         end
@@ -159,30 +172,33 @@ module sync_fifo #(
     // ------------------------------------------------------------ output stage
 generate
     if (FWFT_ENABLE != 0) begin : g_fwft
-        // Head register with write-forwarding (ARCH §4):
-        //   * overwrite            : head := wr_data (oldest discarded in place)
-        //   * fill-from-empty push : head := wr_data (forwarded, no RAM read)
-        //   * pop with count>1     : head := prefetched next element
+        // Head register maintenance (ARCH §4):
+        //   * fill-from-empty push      : head := wr_data (forwarded, no RAM read)
+        //   * pop with followers (>1)   : head := prefetched next element
+        //   * OVERWRITE on full         : front discarded -> second element is
+        //                                 the new head (loaded via prefetch port)
+        //   * CC-05 corner (count==1 + simultaneous granted push&pop):
+        //                                 incoming word becomes the new head
         logic [DATA_WIDTH-1:0] head_q;
-        wire fill_empty   = push_granted && (count_q == '0);
-        // OVERWRITE on full stores into the head slot: replaces oldest in place
-        wire overwrite_wr = push_granted && (count_q == CNT_W'(DEPTH));
-        wire head_reload  = pop_granted  && (count_q > CNT_W'(1));
+        wire fill_empty    = push_granted && (count_q == '0);
+        // overwrite_wr is module-level: discard+append on a full FIFO
+        wire head_reload   = (pop_granted && (count_q > CNT_W'(1))) || overwrite_wr;
+        wire head_fwd_pop1 = pop_granted && push_granted && (count_q == CNT_W'(1));
 
         always_ff @(posedge clk) begin
-            if (rst)               head_q <= '0;
-            else if (overwrite_wr) head_q <= wr_data;
-            else if (fill_empty)   head_q <= wr_data;
-            else if (head_reload)  head_q <= mem_q;
+            if (rst)                 head_q <= '0;
+            else if (fill_empty)     head_q <= wr_data;
+            else if (head_fwd_pop1)  head_q <= wr_data;
+            else if (head_reload)    head_q <= mem_q;
         end
 
         // Invariant: prefetch == nxt(head) whenever count>0 (value irrelevant
         // while empty; re-seeded on fill-from-empty).
         always_ff @(posedge clk) begin
-            if (rst)               prefetch_q <= ADDR_W'(1);
-            else if (fill_empty)   prefetch_q <= nxt(wr_addr_q);
-            else if (overwrite_wr) prefetch_q <= nxt(rd_addr_q);
-            else if (pop_granted)  prefetch_q <= nxt(nxt(rd_addr_q));
+            if (rst)                 prefetch_q <= ADDR_W'(1);
+            else if (fill_empty)     prefetch_q <= nxt(wr_addr_q);
+            else if (head_fwd_pop1)  prefetch_q <= nxt(wr_addr_q);
+            else if (head_reload)    prefetch_q <= nxt(nxt(rd_addr_q));
         end
 
         assign rd_data       = (UNDERFLOW_POLICY == fifo_pkg::UNF_ZERO && count_q == '0)
@@ -219,7 +235,7 @@ generate
         assign rd_data_valid = valid_sh[DELAY-1];
 
         // prefetch path unused in this mode; park it deterministically
-        always_comb prefetch_q = '0;
+        assign prefetch_q = '0;
 
         if (OUTPUT_REGISTER != 0) begin : g_outreg
             logic [DATA_WIDTH-1:0] out_q;

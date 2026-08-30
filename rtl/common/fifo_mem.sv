@@ -36,9 +36,9 @@ module fifo_mem #(
     output logic [DW-1:0]             q
 );
     initial begin
-        if (DW < 1)      $error("fifo_mem: DW must be >= 1");
-        if (ENTRIES < 1) $error("fifo_mem: ENTRIES must be >= 1");
-        if (MODE == fifo_pkg::MEM_AUTO) $error("fifo_mem: resolve MEM_AUTO before instantiation");
+        if (DW < 1)      $fatal(1,"fifo_mem: DW must be >= 1");
+        if (ENTRIES < 1) $fatal(1,"fifo_mem: ENTRIES must be >= 1");
+        if (MODE == fifo_pkg::MEM_AUTO) $fatal(1,"fifo_mem: resolve MEM_AUTO before instantiation");
     end
 
     logic [DW-1:0] mem [ENTRIES];
